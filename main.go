@@ -94,7 +94,27 @@ func deleteProdukByID(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	apiInfo := map[string]interface{}{
+		"name":    "Kasir API",
+		"version": "1.0.0",
+		"endpoints": []map[string]string{
+			{"method": "GET", "path": "/api/produk", "description": "Get all products"},
+			{"method": "POST", "path": "/api/produk", "description": "Create new product"},
+			{"method": "GET", "path": "/api/produk/{id}", "description": "Get product by ID"},
+			{"method": "PUT", "path": "/api/produk/{id}", "description": "Update product by ID"},
+			{"method": "DELETE", "path": "/api/produk/{id}", "description": "Delete product by ID"},
+			{"method": "GET", "path": "/health", "description": "Health check"},
+		},
+	}
+	json.NewEncoder(w).Encode(apiInfo)
+}
+
 func main() {
+	// GET localhost:8080/
+	http.HandleFunc("/", handleAPIInfo)
+
 	// GET localhost:8080/api/produk/{id}
 	// PUT localhost:8080/api/produk/{id}
 	// DELETE localhost:8080/api/produk/{id}
