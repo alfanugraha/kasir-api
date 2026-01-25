@@ -2,6 +2,15 @@
 
 A simple RESTful API for managing cashier/point-of-sale operations, built with Go. This API provides endpoints for managing products and categories.
 
+## Live Demo
+
+The API is deployed and accessible at: **https://kasir-api-production-efe3.up.railway.app/**
+
+Try it out:
+- API Info: https://kasir-api-production-efe3.up.railway.app/
+- Get all products: https://kasir-api-production-efe3.up.railway.app/api/produk
+- Health check: https://kasir-api-production-efe3.up.railway.app/health
+
 ## Features
 
 - Product management (CRUD operations)
@@ -34,6 +43,17 @@ go run main.go
 ```
 
 The server will start on `http://localhost:8080`
+
+## Deployment
+
+This application is deployed on [Railway](https://railway.app/).
+
+**Production URL:** https://kasir-api-production-efe3.up.railway.app/
+
+The deployment is configured to:
+- Automatically deploy from the master branch
+- Run on Railway's infrastructure
+- Use the default port provided by Railway via the `PORT` environment variable
 
 ## Project Structure
 
@@ -274,6 +294,8 @@ GET /health
 
 ## Testing with cURL
 
+### Using Local Server (http://localhost:8080)
+
 ### Get all products:
 ```bash
 curl http://localhost:8080/api/produk
@@ -301,6 +323,37 @@ curl -X PUT http://localhost:8080/api/produk/1 \
 ### Delete a product:
 ```bash
 curl -X DELETE http://localhost:8080/api/produk/1
+```
+
+### Using Production Server (Railway)
+
+### Get all products:
+```bash
+curl https://kasir-api-production-efe3.up.railway.app/api/produk
+```
+
+### Get product by ID:
+```bash
+curl https://kasir-api-production-efe3.up.railway.app/api/produk/1
+```
+
+### Create a new product:
+```bash
+curl -X POST https://kasir-api-production-efe3.up.railway.app/api/produk \
+  -H "Content-Type: application/json" \
+  -d '{"nama":"Keyboard","harga":150000,"stok":50,"id_category":1}'
+```
+
+### Update a product:
+```bash
+curl -X PUT https://kasir-api-production-efe3.up.railway.app/api/produk/1 \
+  -H "Content-Type: application/json" \
+  -d '{"nama":"Laptop Updated","harga":16000000,"stok":8,"id_category":1}'
+```
+
+### Delete a product:
+```bash
+curl -X DELETE https://kasir-api-production-efe3.up.railway.app/api/produk/1
 ```
 
 ## Data Models
