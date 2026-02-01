@@ -82,7 +82,7 @@ Returns API information including name, version, and available endpoints.
 ```json
 {
   "name": "Kasir API",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "endpoints": [...]
 }
 ```
@@ -100,9 +100,11 @@ Returns a list of all products.
 [
   {
     "id": 1,
-    "nama": "Laptop",
-    "harga": 15000000,
-    "stok": 10
+    "name": "Laptop",
+    "price": 15000000,
+    "stock": 10, 
+    "category_id": 1,
+    "category": "Electronics"
   }
 ]
 ```
@@ -116,10 +118,12 @@ Returns a single product by ID.
 **Response:**
 ```json
 {
-  "id": 1,
-  "nama": "Laptop",
-  "harga": 15000000,
-  "stok": 10
+  "id": 4,
+  "name": "Smartphone",
+  "price": 8000000,
+  "stock": 20,
+  "category_id": 1,
+  "category": "Electronics"
 }
 ```
 
@@ -132,19 +136,22 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "nama": "Mouse",
-  "harga": 50000,
-  "stok": 100
+  "name": "Jeans",
+  "price": 400000,
+  "stock": 7,
+  "category_id": 4
 }
 ```
 
 **Response:**
 ```json
 {
-  "id": 4,
-  "nama": "Mouse",
-  "harga": 50000,
-  "stok": 100
+  "id": 7,
+  "name": "Jeans",
+  "price": 400000,
+  "stock": 7,
+  "category_id": 4,
+  "category": ""
 }
 ```
 
@@ -157,19 +164,22 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "nama": "Laptop Gaming",
-  "harga": 20000000,
-  "stok": 5
+  "name": "Laptop",
+  "price": 15000000,
+  "stock": 3,
+  "category_id": 1
 }
 ```
 
 **Response:**
 ```json
 {
-  "id": 1,
-  "nama": "Laptop Gaming",
-  "harga": 20000000,
-  "stok": 5
+  "id": 3,
+  "name": "Laptop",
+  "price": 15000000,
+  "stock": 3,
+  "category_id": 1,
+  "category": ""
 }
 ```
 
@@ -181,7 +191,7 @@ DELETE /api/produk/{id}
 **Response:**
 ```json
 {
-  "message": "Produk berhasil dihapus"
+    "message": "Product deleted successfully"
 }
 ```
 
@@ -198,7 +208,7 @@ Returns a list of all categories.
 [
   {
     "id": 1,
-    "nama": "Elektronik",
+    "category": "Elektronik",
     "description": "Perangkat elektronik seperti laptop, smartphone, dll."
   }
 ]
@@ -214,7 +224,7 @@ Returns a single category by ID.
 ```json
 {
   "id": 1,
-  "nama": "Elektronik",
+  "category": "Elektronik",
   "description": "Perangkat elektronik seperti laptop, smartphone, dll."
 }
 ```
@@ -228,7 +238,7 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "nama": "Makanan",
+  "category": "Makanan",
   "description": "Produk makanan dan minuman"
 }
 ```
@@ -237,7 +247,7 @@ Content-Type: application/json
 ```json
 {
   "id": 3,
-  "nama": "Makanan",
+  "category": "Makanan",
   "description": "Produk makanan dan minuman"
 }
 ```
@@ -251,7 +261,7 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "nama": "Elektronik Rumah",
+  "category": "Elektronik Rumah",
   "description": "Perangkat elektronik untuk rumah tangga"
 }
 ```
@@ -260,7 +270,7 @@ Content-Type: application/json
 ```json
 {
   "id": 1,
-  "nama": "Elektronik Rumah",
+  "category": "Elektronik Rumah",
   "description": "Perangkat elektronik untuk rumah tangga"
 }
 ```
@@ -273,7 +283,7 @@ DELETE /api/categories/{id}
 **Response:**
 ```json
 {
-  "message": "Kategori berhasil dihapus"
+  "message": "Category deleted successfully"
 }
 ```
 

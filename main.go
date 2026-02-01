@@ -24,7 +24,7 @@ func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	apiInfo := map[string]interface{}{
 		"name":    "Kasir API",
-		"version": "1.0.0",
+		"version": "2.0.0",
 		"endpoints": []map[string]string{
 			{"method": "GET", "path": "/api/produk", "description": "Get all products"},
 			{"method": "POST", "path": "/api/produk", "description": "Create new product"},
