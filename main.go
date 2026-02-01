@@ -3,179 +3,21 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"kasir-api/internal/model"
+	"kasir-api/database"
+	"kasir-api/handler"
+	"kasir-api/repository"
+	"kasir-api/service"
+	"log"
 	"net/http"
-	"strconv"
+	"os"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
-var produk = []model.Produk{
-	{ID: 1, Nama: "Laptop", Harga: 15000000, Stok: 10},
-	{ID: 2, Nama: "Smartphone", Harga: 5000000, Stok: 25},
-	{ID: 3, Nama: "Tablet", Harga: 7000000, Stok: 15},
-}
-
-var kategori = []model.Kategori{
-	{ID: 1, Kategori: "Elektronik", Keterangan: "Perangkat elektronik seperti laptop, smartphone, dll."},
-	{ID: 2, Kategori: "Peralatan Rumah Tangga", Keterangan: "Peralatan untuk kebutuhan rumah tangga."},
-}
-
-func getProdukByID(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/produk/")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "Invalid Produk ID", http.StatusBadRequest)
-		return
-	}
-
-	for _, p := range produk {
-		if p.ID == id {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(p)
-			return
-		}
-	}
-
-	http.Error(w, "Produk belum ada", http.StatusNotFound)
-}
-
-func updateProdukByID(w http.ResponseWriter, r *http.Request) {
-	// get id from request URL
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/produk/")
-
-	// change int
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "Invalid Produk ID", http.StatusBadRequest)
-		return
-	}
-
-	// get data from request body
-	var updateProduk model.Produk
-	err = json.NewDecoder(r.Body).Decode(&updateProduk)
-	if err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
-	// loop produk, find id, change data
-	for i := range produk {
-		if produk[i].ID == id {
-			updateProduk.ID = id
-			produk[i] = updateProduk
-
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(updateProduk)
-			return
-		}
-	}
-}
-
-func deleteProdukByID(w http.ResponseWriter, r *http.Request) {
-	// get id from request URL
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/produk/")
-
-	// change int
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "Invalid Produk ID", http.StatusBadRequest)
-		return
-	}
-
-	// loop produk, find id
-	for i, p := range produk {
-		if p.ID == id {
-			// create new slice before and after index
-			produk = append(produk[:i], produk[i+1:]...)
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]string{
-				"message": "Produk berhasil dihapus",
-			})
-			return
-		}
-	}
-
-	http.Error(w, "Produk belum ada", http.StatusNotFound)
-
-}
-
-func getKategoriByID(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/categories/")
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "Invalid Category ID", http.StatusBadRequest)
-		return
-	}
-
-	for _, p := range kategori {
-		if p.ID == id {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(p)
-			return
-		}
-	}
-
-	http.Error(w, "Kategori belum ada", http.StatusNotFound)
-}
-
-func updateKategoriByID(w http.ResponseWriter, r *http.Request) {
-	// get id from request URL
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/categories/")
-
-	// change int
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "Invalid Category ID", http.StatusBadRequest)
-		return
-	}
-
-	// get data from request body
-	var updateKategori model.Kategori
-	err = json.NewDecoder(r.Body).Decode(&updateKategori)
-	if err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
-	}
-	// loop produk, find id, change data
-	for i := range kategori {
-		if kategori[i].ID == id {
-			updateKategori.ID = id
-			kategori[i] = updateKategori
-
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(updateKategori)
-			return
-		}
-	}
-}
-
-func deleteKategoriByID(w http.ResponseWriter, r *http.Request) {
-	// get id from request URL
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/categories/")
-
-	// change int
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		http.Error(w, "Invalid Category ID", http.StatusBadRequest)
-		return
-	}
-
-	// loop produk, find id
-	for i, p := range kategori {
-		if p.ID == id {
-			// create new slice before and after index
-			kategori = append(kategori[:i], kategori[i+1:]...)
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]string{
-				"message": "Kategori berhasil dihapus",
-			})
-			return
-		}
-	}
-
-	http.Error(w, "Kategori belum ada", http.StatusNotFound)
-
+type Config struct {
+	Port   string `mapstructure:"PORT"`
+	DBConn string `mapstructure:"DB_CONN"`
 }
 
 func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
@@ -201,86 +43,42 @@ func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// GET localhost:8080/
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+
+	if _, err := os.Stat(".env"); err == nil {
+		viper.SetConfigFile(".env")
+		_ = viper.ReadInConfig()
+	}
+
+	config := Config{
+		Port:   viper.GetString("PORT"),
+		DBConn: viper.GetString("DB_CONN"),
+	}
+
+	db, err := database.InitDB(config.DBConn)
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+	defer db.Close()
+
+	productRepo := repository.NewProductRepository(db)
+	productService := service.NewProductService(productRepo)
+	productHandler := handler.NewProductHandler(productService)
+
+	categoryRepo := repository.NewCategoryRepository(db)
+	categoryService := service.NewCategoryService(categoryRepo)
+	categoryHandler := handler.NewCategoryHandler(categoryService)
+
+	// setup routes
 	http.HandleFunc("/", handleAPIInfo)
+	http.HandleFunc("/api/produk", productHandler.HandleProducts)
+	http.HandleFunc("/api/produk/", productHandler.HandleProducts)
+	http.HandleFunc("/api/produk/{id}", productHandler.HandleProductByID)
 
-	// GET localhost:8080/api/produk/{id}
-	// PUT localhost:8080/api/produk/{id}
-	// DELETE localhost:8080/api/produk/{id}
-	http.HandleFunc("/api/produk/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			getProdukByID(w, r)
-		} else if r.Method == "PUT" {
-			updateProdukByID(w, r)
-		} else if r.Method == "DELETE" {
-			deleteProdukByID(w, r)
-		}
-
-	})
-
-	// GET localhost:8080/api/produk
-	// POST localhost:8080/api/produk
-	http.HandleFunc("/api/produk", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(produk)
-		} else if r.Method == "POST" {
-			// read data from request
-			var produkBaru model.Produk
-			err := json.NewDecoder(r.Body).Decode(&produkBaru)
-			if err != nil {
-				http.Error(w, "Invalid request", http.StatusBadRequest)
-				return
-			}
-
-			// input data to produk slice
-			produkBaru.ID = len(produk) + 1
-			produk = append(produk, produkBaru)
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusCreated) // 201
-			json.NewEncoder(w).Encode(produkBaru)
-		}
-	})
-
-	// GET localhost:8080/api/categories/{id}
-	// PUT localhost:8080/api/categories/{id}
-	// DELETE localhost:8080/api/categories/{id}
-	http.HandleFunc("/api/categories/", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			getKategoriByID(w, r)
-		} else if r.Method == "PUT" {
-			updateKategoriByID(w, r)
-		} else if r.Method == "DELETE" {
-			deleteKategoriByID(w, r)
-		}
-
-	})
-
-	// GET localhost:8080/api/categories
-	// POST localhost:8080/api/categories
-	http.HandleFunc("/api/categories", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "GET" {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(kategori)
-		} else if r.Method == "POST" {
-			// read data from request
-			var kategoriBaru model.Kategori
-			err := json.NewDecoder(r.Body).Decode(&kategoriBaru)
-			if err != nil {
-				http.Error(w, "Invalid request", http.StatusBadRequest)
-				return
-			}
-
-			// input data to produk slice
-			kategoriBaru.ID = len(kategori) + 1
-			kategori = append(kategori, kategoriBaru)
-
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusCreated) // 201
-			json.NewEncoder(w).Encode(kategoriBaru)
-		}
-	})
+	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
+	http.HandleFunc("/api/categories/", categoryHandler.HandleCategories)
+	http.HandleFunc("/api/categories/{id}", categoryHandler.HandleCategoryByID)
 
 	// localhost:8080/health
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -291,9 +89,9 @@ func main() {
 		})
 		w.Write([]byte("OK"))
 	})
-	fmt.Println("Starting server at :8080")
+	fmt.Println("Starting server at localhost:" + config.Port)
 
-	err := http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":"+config.Port, nil)
 	if err != nil {
 		fmt.Println("Server failed to start")
 	}
