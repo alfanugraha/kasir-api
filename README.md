@@ -8,13 +8,18 @@ The API is deployed and accessible at: **https://kasir-api-production-efe3.up.ra
 
 Try it out:
 - API Info: https://kasir-api-production-efe3.up.railway.app/
-- Get all products: https://kasir-api-production-efe3.up.railway.app/api/produk
 - Health check: https://kasir-api-production-efe3.up.railway.app/health
+- Get all products: https://kasir-api-production-efe3.up.railway.app/api/produk
+- Get categories: https://kasir-api-production-efe3.up.railway.app/api/categories
+- Checkout transactions: https://kasir-api-production-efe3.up.railway.app/api/checkout
+- Get report transaction within given date: https://kasir-api-production-efe3.up.railway.app/api/report
 
 ## Features
 
 - Product management (CRUD operations)
 - Category management (CRUD operations)
+- Checkout management
+- Transaction report request
 - Health check endpoint
 - API information endpoint
 - JSON response format
@@ -58,14 +63,30 @@ The deployment is configured to:
 ## Project Structure
 
 ```
-kasir-api/
-├── main.go              # Main application file with HTTP handlers
-├── go.mod              # Go module definition
-├── internal/
-│   └── model/
-│       ├── produk.go   # Product model
-│       └── kategori.go # Category model
-└── README.md           # This file
+└── 📁kasir-api
+    └── 📁database
+        ├── config.go
+    └── 📁handler
+        ├── category_handler.go
+        ├── product_handler.go
+        ├── transaction_handler.go
+    └── 📁model
+        ├── category_model.go
+        ├── product_model.go
+        ├── transaction_model.go
+    └── 📁repository
+        ├── category_repository.go
+        ├── product_repository.go
+        ├── transaction_repository.go
+    └── 📁service
+        ├── category_service.go
+        ├── product_service.go
+        ├── transaction_service.go
+    ├── .gitignore
+    ├── go.mod
+    ├── go.sum
+    ├── main.g
+    └── README.md
 ```
 
 ## API Endpoints
@@ -99,13 +120,15 @@ Returns a list of all products.
 ```json
 [
   {
-    "id": 1,
+    "id": 3,
     "name": "Laptop",
     "price": 15000000,
-    "stock": 10, 
-    "category_id": 1,
-    "category": "Electronics"
-  }
+    "stock": 3,
+    "category": {
+        "id": 1,
+        "category": "Electronics",
+        "description": "Electronic devices and gadgets"
+    }
 ]
 ```
 
@@ -118,12 +141,15 @@ Returns a single product by ID.
 **Response:**
 ```json
 {
-  "id": 4,
-  "name": "Smartphone",
-  "price": 8000000,
-  "stock": 20,
-  "category_id": 1,
-  "category": "Electronics"
+    "id": 3,
+    "name": "Laptop",
+    "price": 15000000,
+    "stock": 3,
+    "category": {
+        "id": 1,
+        "category": "Electronics",
+        "description": "Electronic devices and gadgets"
+    }
 }
 ```
 
@@ -139,7 +165,7 @@ Content-Type: application/json
   "name": "Jeans",
   "price": 400000,
   "stock": 7,
-  "category_id": 4
+  "category_id": 5
 }
 ```
 
@@ -150,8 +176,11 @@ Content-Type: application/json
   "name": "Jeans",
   "price": 400000,
   "stock": 7,
-  "category_id": 4,
-  "category": ""
+  "category": {
+    "id": 5,
+    "category": "Clothing",
+    "description": "Apparel and fashion items"
+  }
 }
 ```
 
@@ -178,8 +207,11 @@ Content-Type: application/json
   "name": "Laptop",
   "price": 15000000,
   "stock": 3,
-  "category_id": 1,
-  "category": ""
+    "category": {
+        "id": 1,
+        "category": "Electronics",
+        "description": "Electronic devices and gadgets"
+    }
 }
 ```
 
@@ -284,6 +316,93 @@ DELETE /api/categories/{id}
 ```json
 {
   "message": "Category deleted successfully"
+}
+```
+
+### Transaction
+
+#### Checkout
+```
+POST /api/categories
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+    "items": [
+        {
+            "product_id": 5,
+            "quantity": 6
+        },
+        {
+            "product_id": 7,
+            "quantity": 2
+        }
+    ]
+}
+```
+
+**Response:**
+```json
+{
+    "id": 1,
+    "total_price": 3800000,
+    "created_at": "0001-01-01T00:00:00Z",
+    "details": [
+        {
+            "id": 0,
+            "transaction_id": 0,
+            "product_id": 5,
+            "product_name": "T-Shirt",
+            "quantity": 6,
+            "subtotal": 3000000
+        },
+        {
+            "id": 0,
+            "transaction_id": 0,
+            "product_id": 7,
+            "product_name": "Jeans",
+            "quantity": 2,
+            "subtotal": 800000
+        }
+    ]
+}
+```
+
+#### Today's Transaction Report
+```
+GET /api/report/hari-ini
+```
+Returns a report of today's transaction.
+
+**Response:**
+```json
+{
+    "total_revenue": 3800000,
+    "total_transaksi": 1,
+    "produk_terlaris": {
+        "nama": "T-Shirt",
+        "qty_terjual": 6
+    }
+}
+```
+
+#### Request Transaction Report By Date Range
+```
+GET /api/report?start_date=2025-01-01&end_date=2026-12-31
+```
+Returns a report of today's transaction.
+
+**Response:**
+```json
+{
+    "total_revenue": 3800000,
+    "total_transaksi": 1,
+    "produk_terlaris": {
+        "nama": "T-Shirt",
+        "qty_terjual": 6
+    }
 }
 ```
 

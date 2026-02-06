@@ -24,8 +24,9 @@ func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	apiInfo := map[string]interface{}{
 		"name":    "Kasir API",
-		"version": "2.0.0",
+		"version": "3.0.0",
 		"endpoints": []map[string]string{
+			{"method": "GET", "path": "/health", "description": "Health check"},
 			{"method": "GET", "path": "/api/produk", "description": "Get all products"},
 			{"method": "POST", "path": "/api/produk", "description": "Create new product"},
 			{"method": "GET", "path": "/api/produk/{id}", "description": "Get product by ID"},
@@ -36,7 +37,9 @@ func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
 			{"method": "GET", "path": "/api/categories/{id}", "description": "Get category by ID"},
 			{"method": "PUT", "path": "/api/categories/{id}", "description": "Update category by ID"},
 			{"method": "DELETE", "path": "/api/categories/{id}", "description": "Delete category by ID"},
-			{"method": "GET", "path": "/health", "description": "Health check"},
+			{"method": "POST", "path": "/api/checkout", "description": "Checkout transaction"},
+			{"method": "GET", "path": "/api/report/hari-ini", "description": "Get today's transactions report"},
+			{"method": "GET", "path": "/api/report", "description": "Get transactions report by date range"},
 		},
 	}
 	json.NewEncoder(w).Encode(apiInfo)
