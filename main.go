@@ -39,7 +39,7 @@ func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
 			{"method": "DELETE", "path": "/api/categories/{id}", "description": "Delete category by ID"},
 			{"method": "POST", "path": "/api/checkout", "description": "Checkout transaction"},
 			{"method": "GET", "path": "/api/report/hari-ini", "description": "Get today's transactions report"},
-			{"method": "GET", "path": "/api/report", "description": "Get transactions report by date range"},
+			{"method": "GET", "path": "/api/report?start_date={start_date}&end_date={end_date}", "description": "Get transactions report by date range"},
 		},
 	}
 	json.NewEncoder(w).Encode(apiInfo)
