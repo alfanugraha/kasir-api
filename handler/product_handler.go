@@ -30,7 +30,9 @@ func (h *ProductHandler) HandleProducts(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *ProductHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) {
-	product, err := h.service.GetAllProducts()
+	name := r.URL.Query().Get("name")
+	// fmt.Println(name)
+	product, err := h.service.GetAllProducts(name)
 	if err != nil {
 		http.Error(w, "Failed to get products, check if exists", http.StatusInternalServerError)
 		return
@@ -41,14 +43,14 @@ func (h *ProductHandler) GetAllProducts(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var product model.Product
-	err := json.NewDecoder(r.Body).Decode(&product)
+	var input model.ProductInput
+	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	err = h.service.Create(&product)
+	product, err := h.service.Create(&input)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -100,15 +102,14 @@ func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var product model.Product
-	err = json.NewDecoder(r.Body).Decode(&product)
+	var input model.ProductInput
+	err = json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	product.ID = id
-	err = h.service.Update(&product)
+	product, err := h.service.Update(id, &input)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

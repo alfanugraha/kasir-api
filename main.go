@@ -70,15 +70,21 @@ func main() {
 	categoryService := service.NewCategoryService(categoryRepo)
 	categoryHandler := handler.NewCategoryHandler(categoryService)
 
+	transactionRepo := repository.NewTransactionRepository(db)
+	transactionService := service.NewTransactionService(transactionRepo)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
+
 	// setup routes
 	http.HandleFunc("/", handleAPIInfo)
 	http.HandleFunc("/api/produk", productHandler.HandleProducts)
-	http.HandleFunc("/api/produk/", productHandler.HandleProducts)
-	http.HandleFunc("/api/produk/{id}", productHandler.HandleProductByID)
+	http.HandleFunc("/api/produk/", productHandler.HandleProductByID)
 
 	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
-	http.HandleFunc("/api/categories/", categoryHandler.HandleCategories)
-	http.HandleFunc("/api/categories/{id}", categoryHandler.HandleCategoryByID)
+	http.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
+
+	http.HandleFunc("/api/checkout", transactionHandler.HandleCheckout)
+	http.HandleFunc("/api/report/hari-ini", transactionHandler.HandleTransactionsByDateRange)
+	http.HandleFunc("/api/report", transactionHandler.HandleTransactionsByDateRange)
 
 	// localhost:8080/health
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
