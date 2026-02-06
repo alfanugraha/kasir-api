@@ -85,7 +85,7 @@ The deployment is configured to:
     ├── .gitignore
     ├── go.mod
     ├── go.sum
-    ├── main.g
+    ├── main.go
     └── README.md
 ```
 
