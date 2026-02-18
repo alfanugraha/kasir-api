@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -12,11 +13,11 @@ func APIKey(validApiKey string) func(http.HandlerFunc) http.HandlerFunc {
 			apiKey := r.Header.Get("X-API-Key")
 
 			// Debug logging
-			// fmt.Printf("=== API Key Debug ===\n")
-			// fmt.Printf("Expected API Key: '%s' (length: %d)\n", validApiKey, len(validApiKey))
-			// fmt.Printf("Received API Key: '%s' (length: %d)\n", apiKey, len(apiKey))
-			// fmt.Printf("Match: %v\n", apiKey == validApiKey)
-			// fmt.Printf("====================\n")
+			fmt.Printf("=== API Key Debug ===\n")
+			fmt.Printf("Expected API Key: '%s' (length: %d)\n", validApiKey, len(validApiKey))
+			fmt.Printf("Received API Key: '%s' (length: %d)\n", apiKey, len(apiKey))
+			fmt.Printf("Match: %v\n", apiKey == validApiKey)
+			fmt.Printf("====================\n")
 
 			if apiKey == "" {
 				http.Error(w, "API Key required", http.StatusUnauthorized)
