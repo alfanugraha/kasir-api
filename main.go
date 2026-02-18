@@ -53,14 +53,23 @@ func main() {
 
 	if _, err := os.Stat(".env"); err == nil {
 		viper.SetConfigFile(".env")
-		_ = viper.ReadInConfig()
+		viper.SetConfigType("env")
+		if err := viper.ReadInConfig(); err != nil {
+			log.Printf("Error reading config file: %v\n", err)
+		}
 	}
 
 	config := Config{
 		Port:   viper.GetString("PORT"),
 		DBConn: viper.GetString("DB_CONN"),
-		APIKey: viper.GetString("API_KEY"),
+		APIKey: viper.GetString("APIKEY"),
 	}
+
+	// Debug: Print loaded config
+	// fmt.Printf("=== Config Loaded ===\n")
+	// fmt.Printf("Port: '%s'\n", config.Port)
+	// fmt.Printf("API Key: '%s' (length: %d)\n", config.APIKey, len(config.APIKey))
+	// fmt.Printf("====================\n")
 
 	db, err := database.InitDB(config.DBConn)
 	if err != nil {
