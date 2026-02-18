@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"kasir-api/database"
 	"kasir-api/handler"
+	"kasir-api/middleware"
 	"kasir-api/repository"
 	"kasir-api/service"
 	"log"
@@ -18,6 +19,7 @@ import (
 type Config struct {
 	Port   string `mapstructure:"PORT"`
 	DBConn string `mapstructure:"DB_CONN"`
+	APIKey string `mapstructure:"API_KEY"`
 }
 
 func handleAPIInfo(w http.ResponseWriter, r *http.Request) {
@@ -57,6 +59,7 @@ func main() {
 	config := Config{
 		Port:   viper.GetString("PORT"),
 		DBConn: viper.GetString("DB_CONN"),
+		APIKey: viper.GetString("API_KEY"),
 	}
 
 	db, err := database.InitDB(config.DBConn)
@@ -64,6 +67,8 @@ func main() {
 		log.Fatal("Failed to connect to database:", err)
 	}
 	defer db.Close()
+
+	apiKeyMiddleware := middleware.APIKey(config.APIKey)
 
 	productRepo := repository.NewProductRepository(db)
 	productService := service.NewProductService(productRepo)
@@ -80,12 +85,12 @@ func main() {
 	// setup routes
 	http.HandleFunc("/", handleAPIInfo)
 	http.HandleFunc("/api/produk", productHandler.HandleProducts)
-	http.HandleFunc("/api/produk/", productHandler.HandleProductByID)
+	http.HandleFunc("/api/produk/", apiKeyMiddleware(productHandler.HandleProductByID))
 
 	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	http.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
 
-	http.HandleFunc("/api/checkout", transactionHandler.HandleCheckout)
+	http.HandleFunc("/api/checkout", apiKeyMiddleware(transactionHandler.HandleCheckout))
 	http.HandleFunc("/api/report/hari-ini", transactionHandler.HandleTransactionsByDateRange)
 	http.HandleFunc("/api/report", transactionHandler.HandleTransactionsByDateRange)
 
