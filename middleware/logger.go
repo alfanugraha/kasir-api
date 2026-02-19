@@ -15,6 +15,6 @@ func Logger(next http.HandlerFunc) http.HandlerFunc {
 		next(w, r)
 
 		duration := time.Since(start)
-		log.Printf("[DONE] %s %s selesai dalam %v", r.Method, r.RequestURI, duration)
+		log.Printf("[DONE]    %s %s selesai dalam %v", r.Method, r.RequestURI, duration)
 	}
 }
