@@ -84,7 +84,7 @@ func (repo *TransactionRepository) GetTodayTransactions() (*model.TransactionRep
 	err := repo.db.QueryRow(`
 			SELECT
 				COUNT(*) AS total_transaksi,
-				SUM(total_price) AS total_revenue
+				COALESCE(SUM(total_price), 0) AS total_revenue
 			FROM transaction
 			WHERE created_at::date = CURRENT_DATE`).Scan(
 		&report.TotalTransactions,
