@@ -100,8 +100,8 @@ func main() {
 	http.HandleFunc("/api/categories/", middleware.CORS(middleware.Logger(apiKeyMiddleware(categoryHandler.HandleCategoryByID))))
 
 	http.HandleFunc("/api/checkout", middleware.CORS(middleware.Logger(apiKeyMiddleware(transactionHandler.HandleCheckout))))
-	http.HandleFunc("/api/report/hari-ini", middleware.CORS(middleware.Logger(apiKeyMiddleware(transactionHandler.HandleTransactionsByDateRange))))
-	http.HandleFunc("/api/report", middleware.CORS(middleware.Logger(apiKeyMiddleware(transactionHandler.HandleTransactionsByDateRange))))
+	http.HandleFunc("/api/report/hari-ini", middleware.CORS(middleware.Logger(transactionHandler.HandleTransactionsByDateRange)))
+	http.HandleFunc("/api/report", middleware.CORS(middleware.Logger(transactionHandler.HandleTransactionsByDateRange)))
 
 	// localhost:8080/health
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
