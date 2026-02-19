@@ -93,13 +93,13 @@ func main() {
 
 	// setup routes
 	http.HandleFunc("/", handleAPIInfo)
-	http.HandleFunc("/api/produk", middleware.CORS(productHandler.HandleProducts))
-	http.HandleFunc("/api/produk/", middleware.CORS(apiKeyMiddleware(productHandler.HandleProductByID)))
+	http.HandleFunc("/api/produk", middleware.CORS(middleware.Logger(productHandler.HandleProducts)))
+	http.HandleFunc("/api/produk/", middleware.CORS(middleware.Logger(apiKeyMiddleware(productHandler.HandleProductByID))))
 
-	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
-	http.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
+	http.HandleFunc("/api/categories", middleware.CORS(middleware.Logger(categoryHandler.HandleCategories)))
+	http.HandleFunc("/api/categories/", middleware.CORS(middleware.Logger(apiKeyMiddleware(categoryHandler.HandleCategoryByID))))
 
-	http.HandleFunc("/appapiKeyMiddleware(transactionHandler.HandleCheckout))
+	http.HandleFunc("/api/checkout", middleware.CORS(middleware.Logger(apiKeyMiddleware(transactionHandler.HandleCheckout))))
 	http.HandleFunc("/api/report/hari-ini", transactionHandler.HandleTransactionsByDateRange)
 	http.HandleFunc("/api/report", transactionHandler.HandleTransactionsByDateRange)
 
